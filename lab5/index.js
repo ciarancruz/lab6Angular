@@ -51,17 +51,19 @@ async function addUser() {
   }
 }
 
-const button = document.querySelector("#addUser");
-button.addEventListener("click", addUser);
+const addUserButton = document.querySelector("#addUser");
+addUserButton.addEventListener("click", addUser);
+const signOutButton = document.querySelector("#signOutUser");
+signOutButton.addEventListener("click", signOutUser);
 
 ////////////////AUTHENTICATION////////////////
 const uiConfig = {
   signInSuccessUrl: "index.html",
   signInOptions: [
-{
-    provider: firebase.auth.EmailAuthProvider.PROVIDER_ID, 
-    requireDisplayName: false
-}
+    {
+      provider: firebase.auth.EmailAuthProvider.PROVIDER_ID, 
+      requireDisplayName: false
+    }
   ]
 };
 
@@ -75,6 +77,7 @@ onAuthStateChanged(auth, (user) => {
       authEl.innerHTML = "";
       authEl.style.display = "none";
       document.getElementById("addUser").style.display = "block";
+      document.getElementById("signOutUser").style.display = "block";
       console.log(auth.currentUser.toJSON());
       
   } else {
@@ -86,4 +89,19 @@ onAuthStateChanged(auth, (user) => {
   }
 });
 
-signOut(auth);
+function signOutUser() {
+  const auth = getAuth();
+  signOut(auth)
+    .then(() => {
+      console.log("User signed out successfully")
+      document.getElementById("addUser").style.display = "none";
+      document.getElementById("signOutUser").style.display = "none";
+
+      let authEl = document.getElementById("firebaseui-auth-container");
+      authEl.style.display = "block";
+    })
+    .catch((error) => {
+      console.log("Error occurred")
+    })
+}
+  
