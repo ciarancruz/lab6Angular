@@ -1,8 +1,8 @@
 // Import the functions you need from the SDKs you need
 import { initializeApp } from "firebase/app";
 import { getAnalytics } from "firebase/analytics";
-import { getFirestore } from "firebase/firestore";
-import { collection, getDocs, addDoc } from "firebase/firestore";
+import { getDoc, getFirestore } from "firebase/firestore";
+import { doc, collection, getDocs, addDoc, setDoc } from "firebase/firestore";
 import { getAuth, signInWithEmailAndPassword, onAuthStateChanged, signOut } from "firebase/auth";
 
 // import ready-made UI
@@ -10,7 +10,7 @@ import firebase from 'firebase/compat/app';
 import * as firebaseui from 'firebaseui'
 import 'firebaseui/dist/firebaseui.css'
 
-// TODO: Add SDKs for Firebase products that you want to use
+// Add SDKs for Firebase products that you want to use
 // https://firebase.google.com/docs/web/setup#available-libraries
 
 // Your web app's Firebase configuration
@@ -32,31 +32,44 @@ const analytics = getAnalytics(app);
 // Get reference to database
 const db = getFirestore(app);
 
-
-// Get data
-const querySnapshot = await getDocs(collection(db, "users"));
-querySnapshot.forEach((doc) => {
-    console.log(`${doc.id} => ${doc.data().name}`);
-})
-
 // Add user
-async function addUser() {
-  try {
-    const docRef = await addDoc(collection(db, "users"), {
-      name: "John"
-    });
-    console.log("Document written with ID: ", docRef.id);
-  } catch (error) {
-    console.error("Error adding document: ", error);
-  }
+function displayAddUser() {
+    document.getElementById("listPeople").style.display = "none";
+    document.getElementById("addUserScreen").style.display = "flex";
+    document.getElementById('idInput').value = "";
+    document.getElementById('nameInput').value = "";
 }
 
+function addUser() {
+  const id = document.getElementById('idInput').value;
+  const name = document.getElementById('nameInput').value;
+  const data = {
+    name: name
+  }
+
+  const docRef = doc(db, "users", id);
+  setDoc(docRef, data)
+    .then(() => {
+      console.log("Document written");
+    })
+    .catch((e) => {
+      console.error("Error writing document");
+    })
+
+    document.getElementById("addUserScreen").style.display = "none";
+}
+
+const submitButton = document.querySelector('#submitButton');
+submitButton.addEventListener("click", addUser)
 const addUserButton = document.querySelector("#addUser");
-addUserButton.addEventListener("click", addUser);
+addUserButton.addEventListener("click", displayAddUser);
+
 const signOutButton = document.querySelector("#signOutUser");
 signOutButton.addEventListener("click", signOutUser);
+const viewUsersButton = document.querySelector("#viewUsers");
+viewUsersButton.addEventListener("click", displayUsers);
 
-////////////////AUTHENTICATION////////////////
+// Authentication
 const uiConfig = {
   signInSuccessUrl: "index.html",
   signInOptions: [
@@ -78,8 +91,8 @@ onAuthStateChanged(auth, (user) => {
       authEl.style.display = "none";
       document.getElementById("addUser").style.display = "block";
       document.getElementById("signOutUser").style.display = "block";
-      console.log(auth.currentUser.toJSON());
-      
+      document.getElementById("viewUsers").style.display = "block";
+
   } else {
 // here prepare page content you want to be visible during log in
       // ...
@@ -96,6 +109,9 @@ function signOutUser() {
       console.log("User signed out successfully")
       document.getElementById("addUser").style.display = "none";
       document.getElementById("signOutUser").style.display = "none";
+      document.getElementById("viewUsers").style.display = "none";
+
+      document.getElementById("listPeople").innerHTML = "";
 
       let authEl = document.getElementById("firebaseui-auth-container");
       authEl.style.display = "block";
@@ -103,5 +119,27 @@ function signOutUser() {
     .catch((error) => {
       console.log("Error occurred")
     })
+}
+
+// TODO Function to display users
+async function displayUsers() {
+  document.getElementById("addUserScreen").style.display = "none";
+  document.getElementById("listPeople").style.display = "inline-block";
+
+  const querySnapshot = await getDocs(collection(db, "users"));
+  let tableString = "";
+
+  querySnapshot.forEach((doc) => {
+    tableString += `<tr>
+                        <td>${doc.id}</td>
+                        <td>${doc.data().name}</td>
+                    </tr>`
+  });
+
+  document.getElementById("listPeople").getElementsByTagName('tbody')[0].innerHTML = tableString;
+  document.getElementById("listPeople").getElementsByTagName('thead')[0].innerHTML = `<tr>
+                                                                                  <th>ID</th>
+                                                                                  <th>Name</th>
+                                                                              </tr>`
 }
   

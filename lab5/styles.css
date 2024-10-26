@@ -1,0 +1,43 @@
+.navbar {
+    display: flex;
+    justify-content: space-evenly;
+    align-items: center;
+}
+
+.buttons {
+    display: flex;
+    list-style: none;
+}
+
+.buttons li {
+    margin-left: 4rem
+}
+
+.buttons button {
+    background: grey;
+    color: black;
+    font-size: medium;
+    padding: 1rem;
+    border: solid black 2px;
+    border-radius: 1rem;
+}
+
+#listPeople {
+    display: inline-block;
+    margin: 0 auto;
+    font-size: 25px;
+}
+
+#addUserScreen {
+    display: none;
+    font-size: 1.5rem;
+}
+
+#submitButton {
+    margin-left: 1em;
+    border: 2px solid black;
+    background-color: grey;
+    padding: 0.5rem;
+    border-radius: 0.5rem;
+
+}

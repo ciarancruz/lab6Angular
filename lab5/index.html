@@ -4,10 +4,35 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>BaaS Project</title>
+    <link rel="stylesheet" href="./styles.css">
 </head>
 <body>
-    <button id="addUser" style="display: none;">Add User</button>
-    <button id="signOutUser" style="display: none;">Sign Out</button>
+    <div class="navbar">
+        <ul class="buttons">
+            <li><button id="addUser" style="display: none;">Add User</button></li>
+            <li><button id="viewUsers" style="display: none;">View List</button></li>
+            <li><button id="signOutUser" style="display: none;">Sign Out</button></li>
+        </ul>
+    </div>
+
+    <div id="addUserScreen">
+        <form id="addUserForm">
+            <label>ID:</label>
+            <input type="text" id="idInput" required>
+            <label>Name:</label>
+            <input type="text" id="nameInput" required>
+        </form>
+        <button id="submitButton">Add User</button>
+
+    </div>
+    
+
+    <table id="listPeople">
+        <thead>
+        </thead>
+        <tbody>
+        </tbody>
+    </table>
 
     <div id="firebaseui-auth-container"></div>
     <div id="welcome"></div>
