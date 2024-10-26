@@ -1,0 +1,35 @@
+/* Screens */
+
+/* Entry Screen */
+#entryScreen {
+    display: block;
+}
+
+/* Specify Size Screen */
+#specifySizeScreen {
+    display: none;
+}
+
+/* Picture Screen */
+#pictureScreen {
+    display: none;
+    width: 30%;
+    margin: 0 auto;
+}
+
+#pictureScreen h1 {
+    text-align: center;
+}
+
+.container {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    grid-template-rows: repeat(3, 1fr);
+    border: 2px solid black;
+}
+
+.col {
+    border: 1px dotted black;
+    width: 100%;
+    aspect-ratio: 1/1;
+}
