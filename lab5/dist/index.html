@@ -3,10 +3,45 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>BaaS Project</title>
-  <script type="module" crossorigin src="/assets/index-B5Qt9EMX.js"></script>
+    <title>BaaS Project</title>
+  <script type="module" crossorigin src="./assets/index-DF9nb867.js"></script>
+  <link rel="stylesheet" crossorigin href="./assets/index-BCuxF1uA.css">
 </head>
 <body>
-    
+    <div class="navbar">
+        <ul class="buttons">
+            <li><button id="addUser" style="display: none;">Add User</button></li>
+            <li><button id="viewUsers" style="display: none;">View List</button></li>
+            <li><button id="signOutUser" style="display: none;">Sign Out</button></li>
+        </ul>
+    </div>
+
+    <div id="addUserScreen">
+        <form id="addUserForm">
+            <label>ID:</label>
+            <input type="text" id="idInput" required>
+            <label>Name:</label>
+            <input type="text" id="nameInput" required>
+        </form>
+        <button id="submitButton">Add User</button>
+
+    </div>
+    
+
+    <table id="listPeople">
+        <thead>
+        </thead>
+        <tbody>
+        </tbody>
+    </table>
+
+    <div id="firebaseui-auth-container"></div>
+    <div id="welcome"></div>
+
+
+
+    <script src="https://www.gstatic.com/firebasejs/ui/6.0.1/firebase-ui-auth.js"></script>
+    <link type="text/css" rel="stylesheet" href="https://www.gstatic.com/firebasejs/ui/6.0.1/firebase-ui-auth.css" />
+
 </body>
 </html>
