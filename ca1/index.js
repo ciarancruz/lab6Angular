@@ -86,7 +86,7 @@ function drop(ev) {
         addArrow(finalBox);
     }
     else if (startBox.id === "textBox") {
-        console.log("Text box selected");
+        addTextBox(finalBox);
     }
 }
 
@@ -103,3 +103,9 @@ function drag(ev) {
 function addArrow(finalBox) {
     finalBox.innerHTML = `<img src="./src/arrow.jpg" alt="arrowImage" draggable="false"></img>`;
 }
+
+// Add text box
+function addTextBox(finalBox) {
+    finalBox.innerHTML = `<textarea></textarea>`;
+}
+

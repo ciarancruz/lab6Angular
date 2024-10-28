@@ -1,4 +1,7 @@
-/* Screens */
+/* * */
+textarea {
+    resize: none;
+}
 
 /* Entry Screen */
 #entryScreen {
@@ -62,6 +65,13 @@
     height: auto;        
     max-width: 100%;     
     max-height: 100%;
+}
+
+#textBox {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-weight: bold;
 }
 
 
