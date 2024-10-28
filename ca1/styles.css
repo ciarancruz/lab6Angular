@@ -24,7 +24,6 @@
 .container {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
-    grid-template-rows: repeat(3, 1fr);
     border: 2px solid black;
 }
 
@@ -32,4 +31,20 @@
     border: 1px dotted black;
     width: 100%;
     aspect-ratio: 1/1;
+}
+
+.drawingElements {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    margin-top: 2em;
+}
+
+.drawingElements div {
+    border: 1px solid black;
+    width: 100%;
+    aspect-ratio: 1/1;
+}
+
+#arrow {
+    margin-left: 2em;
 }

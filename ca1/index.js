@@ -1,11 +1,11 @@
-// Initialize buttons
+///// Initialize buttons /////
 const startNewButton = document.getElementById("startNewButton");
 startNewButton.addEventListener("click", startNewPicture);
 const retrieveExistingButton = document.getElementById("retrieveExistingButton");
 // retrieveExistingButton.addEventListener("click", );
 
 
-// Show or hide screens
+///// Show or hide screens /////
 function showEntryScreen() {
     document.getElementById('entryScreen').style.display = "block";
     document.getElementById('specifySizeScreen').style.display = "none";
@@ -24,7 +24,7 @@ function showPictureScreen() {
     document.getElementById('specifySizeScreen').style.display = "none";
 }
 
-// Initialize screens
+///// Initialize screens /////
 function startNewPicture() {
     showSpecifySizeScreen();
 
@@ -47,13 +47,44 @@ function startPicture(sizeGrid) {
 
     // Change grid size
     document.querySelector(".container").style.gridTemplateColumns = `repeat(${sizeGrid}, 1fr)`;
+    document.querySelector(".drawingElements").style.gridTemplateColumns = `repeat(${sizeGrid}, 1fr)`;
 
     // Create grid
+    let boxCount = 0;
     for(let i = 0; i < sizeGrid; i++) {
         for(let j = 0; j < sizeGrid; j++) {
-            numBoxesCreated += `<div class="col"></div>`
+            numBoxesCreated += `<div class="col" draggable="true" id="${"box" + boxCount}"></div>`;
+            boxCount++;
         }
     }
 
     document.querySelector(".container").innerHTML = numBoxesCreated;
+
+    // Add event listeners to each box
+    const boxElements = document.querySelectorAll('.col');
+    console.log(boxElements);
+    boxElements.forEach(box => {
+        box.addEventListener("dragstart", drag);
+        box.addEventListener("dragover", allowDrop);
+        box.addEventListener("drop", drop);
+    })
+
+    // Add event listener to drawing elements
+    document.getElementById("arrow").addEventListener("dragstart", drag);
+    document.getElementById("box").addEventListener("dragstart", drag);
+}
+
+///// Drag and Drop Functionality /////
+function drop(ev) {
+    ev.preventDefault();
+    console.log("Final:", ev);
+
+}
+
+function allowDrop(ev) {
+    ev.preventDefault();
+}
+
+function drag(ev) {
+    console.log("Start:", ev);
 }
