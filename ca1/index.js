@@ -71,14 +71,23 @@ function startPicture(sizeGrid) {
 
     // Add event listener to drawing elements
     document.getElementById("arrow").addEventListener("dragstart", drag);
-    document.getElementById("box").addEventListener("dragstart", drag);
+    document.getElementById("textBox").addEventListener("dragstart", drag);
 }
 
 ///// Drag and Drop Functionality /////
+let startBox = null;
+
 function drop(ev) {
     ev.preventDefault();
-    console.log("Final:", ev);
+    const finalBox = ev.target;
+    console.log("Final:", ev.target);
 
+    if(startBox.id === "arrow") {
+        addArrow(finalBox);
+    }
+    else if (startBox.id === "textBox") {
+        console.log("Text box selected");
+    }
 }
 
 function allowDrop(ev) {
@@ -86,5 +95,11 @@ function allowDrop(ev) {
 }
 
 function drag(ev) {
-    console.log("Start:", ev);
+    startBox = ev.target;
+    console.log("Start:", ev.target);
+}
+
+// Add Arrow
+function addArrow(finalBox) {
+    finalBox.innerHTML = `<img src="./src/arrow.jpg" alt="arrowImage" draggable="false"></img>`;
 }
