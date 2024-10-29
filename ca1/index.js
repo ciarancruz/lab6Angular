@@ -67,7 +67,6 @@ function startNewPicture() {
     const specifySizeSubmit = document.getElementById("specifySizeSubmit");
     specifySizeSubmit.addEventListener("click", function(e) {
         var gridSize = document.getElementById('gridSize').value;
-        console.log("Grid Size:", gridSize);
         startPicture(gridSize);
     });
 }
@@ -93,7 +92,7 @@ function startExistingPicture(doc) {
                 numBoxesCreated += `<div class="col" draggable="true" id="${"box" + boxCount}"><img src="./src/arrow.jpg" alt="arrowImage" draggable="false" class="arrow"></img></div>`;
             }
             else if (gridData[boxCount].type == "textbox") {
-                numBoxesCreated += `<div class="col" draggable="true" id="${"box" + boxCount}"><textarea class="textBox">${gridData[boxCount].text}</textarea></div>`;
+                numBoxesCreated += `<div class="col" draggable="true" id="${"box" + boxCount}"><textarea class="textBox" rows="1" draggable="false">${gridData[boxCount].text}</textarea></div>`;
             }
             else {
                 numBoxesCreated += `<div class="col" draggable="true" id="${"box" + boxCount}"></div>`;
@@ -201,7 +200,7 @@ function addArrow(finalBox) {
 
 // Add text box
 function addTextBox(finalBox) {
-    finalBox.innerHTML = `<textarea class="textBox"></textarea>`;
+    finalBox.innerHTML = `<textarea class="textBox" rows="1"></textarea>`;
 }
 
 
