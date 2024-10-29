@@ -23,6 +23,8 @@ textarea {
     display: none;
     width: 30%;
     margin: 0 auto;
+    border: 1px solid green; 
+    padding: 0 10%;
 }
 
 #pictureTitle {
@@ -59,12 +61,8 @@ textarea {
     margin-top: auto;
     margin-bottom: auto;
     display: flex;
-    align-items: center; /* Centers text vertically */
-    justify-content: center; /* Centers text horizontally */
-}
-
-.textBoxSmall {
-    
+    align-items: center; 
+    justify-content: center; 
 }
 
 .col {
@@ -85,14 +83,18 @@ textarea {
 
 .drawingElements div {
     border: 1px solid black;
-    width: 100%;
+    width: 50%;
     height: 95%;
     aspect-ratio: 1/1;
 }
 
-#arrow {
-    margin-left: 2em;
+#textBox {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-weight: bold;
 }
+
 
 #arrow img {
     width: auto;       
@@ -101,11 +103,13 @@ textarea {
     max-height: 100%;
 }
 
-#textBox {
+#deleteElement {
+    margin-top: auto;
+    margin-bottom: auto;
     display: flex;
-    justify-content: center;
-    align-items: center;
-    font-weight: bold;
+    align-items: center; 
+    justify-content: center; 
+    text-align: center;
 }
 
 

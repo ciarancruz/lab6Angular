@@ -159,6 +159,8 @@ function startPicture(sizeGrid) {
     // Add event listener to drawing elements
     document.getElementById("arrow").addEventListener("dragstart", drag);
     document.getElementById("textBox").addEventListener("dragstart", drag);
+    document.getElementById("deleteElement").addEventListener("dragover", allowDrop);
+    document.getElementById("deleteElement").addEventListener("drop", deleteDrop);
 
     // Clear save name text
     document.getElementById("saveName").value = "";
@@ -184,13 +186,25 @@ function drop(ev) {
     }
 }
 
+// Delete Element
+function deleteDrop(ev) {
+    ev.preventDefault();
+    const finalBox = ev.target;
+
+    // Makes sure drawing elements cannot be deleted
+    if (startBox.innerHTML !== "" & startBox.id != "arrow" & startBox.id != "textBox") {
+        startBox.innerHTML = "";
+    }
+    
+}
+
 function allowDrop(ev) {
     ev.preventDefault();
 }
 
 function drag(ev) {
     startBox = ev.target;
-    console.log("Start:", ev.target);
+    console.log("DRAG:", ev.target);
 }
 
 // Add Arrow
