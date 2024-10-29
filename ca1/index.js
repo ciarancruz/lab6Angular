@@ -24,7 +24,7 @@ const db = getFirestore(app);
 const startNewButton = document.getElementById("startNewButton");
 startNewButton.addEventListener("click", startNewPicture);
 const retrieveExistingButton = document.getElementById("retrieveExistingButton");
-retrieveExistingButton.addEventListener("click", loadExistingGame);
+retrieveExistingButton.addEventListener("click", loadExistingPicture);
 
 
 ///// Show or hide screens /////
@@ -72,6 +72,62 @@ function startNewPicture() {
     });
 }
 
+function startExistingPicture(doc) {
+    console.log(doc.id);
+    showPictureScreen();
+    let sizeGrid = doc.data().gridSize;
+    let gridData = doc.data().grid;
+
+    // Set grid size
+    document.querySelector(".container").style.gridTemplateColumns = `repeat(${sizeGrid}, 1fr)`;
+    document.querySelector(".drawingElements").style.gridTemplateColumns = `repeat(${sizeGrid}, 1fr)`;
+
+    let numBoxesCreated = '';
+
+    // Create grid from save
+    let boxCount = 0;
+    for(let i = 0; i < sizeGrid; i++) {
+        for(let j = 0; j < sizeGrid; j++) {
+
+            if (gridData[boxCount].type == "arrow") {
+                numBoxesCreated += `<div class="col" draggable="true" id="${"box" + boxCount}"><img src="./src/arrow.jpg" alt="arrowImage" draggable="false" class="arrow"></img></div>`;
+            }
+            else if (gridData[boxCount].type == "textbox") {
+                numBoxesCreated += `<div class="col" draggable="true" id="${"box" + boxCount}"><textarea class="textBox">${gridData[boxCount].text}</textarea></div>`;
+            }
+            else {
+                numBoxesCreated += `<div class="col" draggable="true" id="${"box" + boxCount}"></div>`;
+            }
+
+            boxCount++;
+        }
+    }
+
+    document.querySelector(".container").innerHTML = numBoxesCreated;
+
+    // Add event listeners to each box
+    const boxElements = document.querySelectorAll('.col');
+    console.log(boxElements);
+    boxElements.forEach(box => {
+        box.addEventListener("dragstart", drag);
+        box.addEventListener("dragover", allowDrop);
+        box.addEventListener("drop", drop);
+    })
+
+    // Add event listener to drawing elements
+    document.getElementById("arrow").addEventListener("dragstart", drag);
+    document.getElementById("textBox").addEventListener("dragstart", drag);
+
+    // Overwrite save
+    document.getElementById("saveName").value = doc.id;
+    document.getElementById("saveName").style.display = "none";
+
+    // Save button event listener
+    const savePictureButton = document.getElementById("savePicture");
+    savePictureButton.addEventListener("click", () => savePictureGrid(sizeGrid));
+    
+}
+
 function startPicture(sizeGrid) {
     showPictureScreen();
 
@@ -104,6 +160,13 @@ function startPicture(sizeGrid) {
     // Add event listener to drawing elements
     document.getElementById("arrow").addEventListener("dragstart", drag);
     document.getElementById("textBox").addEventListener("dragstart", drag);
+
+    // Clear save name text
+    document.getElementById("saveName").value = "";
+
+    // Save button event listener
+    const savePictureButton = document.getElementById("savePicture");
+    savePictureButton.addEventListener("click", () => savePictureGrid(sizeGrid));
 }
 
 ///// Drag and Drop Functionality /////
@@ -133,27 +196,24 @@ function drag(ev) {
 
 // Add Arrow
 function addArrow(finalBox) {
-    finalBox.innerHTML = `<img src="./src/arrow.jpg" alt="arrowImage" draggable="false"></img>`;
+    finalBox.innerHTML = `<img src="./src/arrow.jpg" alt="arrowImage" draggable="false" class="arrow"></img>`;
 }
 
 // Add text box
 function addTextBox(finalBox) {
-    finalBox.innerHTML = `<textarea></textarea>`;
+    finalBox.innerHTML = `<textarea class="textBox"></textarea>`;
 }
 
 
 ///// Save and Retrieve Functionality ///// 
 
-// Save button event listener
-const savePictureButton = document.getElementById("savePicture");
-savePictureButton.addEventListener("click", savePictureGrid);
-
 // Load existing game
-async function loadExistingGame() {
+async function loadExistingPicture() {
     const drawingSaves = await getDocs(collection(db, "drawingSaves"));
 
     // Display list of existing saves
     const tableBody = document.getElementById("listSaves").getElementsByTagName('tbody')[0];
+    tableBody.innerHTML = "";
     drawingSaves.forEach((doc) => {
         const row = document.createElement("tr");
         const id = document.createElement("td");
@@ -161,28 +221,58 @@ async function loadExistingGame() {
 
         id.innerHTML = doc.id;
 
+        // Button listeners
         const playButton = document.createElement("button");
         playButton.id = `${doc.id}button`;
         playButton.innerHTML = "Play";
-        playButton.addEventListener("click", drag);
+        playButton.addEventListener("click", () => startExistingPicture(doc));
 
         button.appendChild(playButton);
         row.appendChild(id);
         row.appendChild(button);
 
         tableBody.appendChild(row);
+        console.log(doc);
     });
 
     showSaveScreen();
 }
 
 // Add a save to firestore db
-function savePictureGrid() {
+function savePictureGrid(sizeGrid) {
     
-    // Save arrows
+    // Retrieve and save current grid data
+    const boxElements = document.querySelectorAll('.col');
+    let jsonData = {
+        gridSize: sizeGrid,
+        grid: []
+    };
 
+    // Add data from each box into json
+    boxElements.forEach(box => {
+       
+        if(box.firstChild == null) {
+            jsonData.grid.push({type: null});
+        }
+        else if (box.firstChild.className == "arrow") {
+            jsonData.grid.push({type: "arrow"});
+        }
+        else {
+            jsonData.grid.push({type: "textbox", text: "sampleText"});
+        }
+    })
+
+    const saveName = document.getElementById("saveName").value;
+    const docRef = doc(db, "drawingSaves", saveName);
+
+    // Add to firestore
+    setDoc(docRef, jsonData)
+    .then(() => {
+      console.log("Document written");
+    })
+    .catch((e) => {
+      console.error("Error writing document");
+    })
 
     showEntryScreen();
-
-
 }
