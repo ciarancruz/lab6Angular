@@ -116,6 +116,8 @@ function startExistingPicture(doc) {
     // Add event listener to drawing elements
     document.getElementById("arrow").addEventListener("dragstart", drag);
     document.getElementById("textBox").addEventListener("dragstart", drag);
+    document.getElementById("deleteElement").addEventListener("dragover", allowDrop);
+    document.getElementById("deleteElement").addEventListener("drop", deleteDrop);
 
     // Overwrite save
     document.getElementById("saveName").value = doc.id;
@@ -271,7 +273,8 @@ function savePictureGrid(sizeGrid) {
             jsonData.grid.push({type: "arrow"});
         }
         else {
-            jsonData.grid.push({type: "textbox", text: "sampleText"});
+            console.log(box.firstChild.value);
+            jsonData.grid.push({type: "textbox", text: box.firstChild.value});
         }
     })
 
