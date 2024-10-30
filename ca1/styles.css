@@ -65,6 +65,10 @@ textarea {
     justify-content: center; 
 }
 
+.textBox:focus {
+    outline: none;
+}
+
 .col {
     border: 1px dotted black;
     width: 100%;

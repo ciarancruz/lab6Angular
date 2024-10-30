@@ -111,6 +111,7 @@ function startExistingPicture(doc) {
         box.addEventListener("dragstart", drag);
         box.addEventListener("dragover", allowDrop);
         box.addEventListener("drop", drop);
+        box.addEventListener("dblclick", () => edit(box));
     })
 
     // Add event listener to drawing elements
@@ -156,6 +157,7 @@ function startPicture(sizeGrid) {
         box.addEventListener("dragstart", drag);
         box.addEventListener("dragover", allowDrop);
         box.addEventListener("drop", drop);
+        box.addEventListener("dblclick", () => edit(box));
     })
 
     // Add event listener to drawing elements
@@ -174,6 +176,7 @@ function startPicture(sizeGrid) {
 
 ///// Drag and Drop Functionality /////
 let startBox = null;
+let selectedBox = null;
 
 function drop(ev) {
     ev.preventDefault();
@@ -185,6 +188,23 @@ function drop(ev) {
     }
     else if (startBox.id === "textBox") {
         addTextBox(finalBox);
+    }
+}
+
+// Edit a box when double clicked
+function edit(box) {
+
+    if (selectedBox != null) {
+        selectedBox.style.border = "1px dotted black";
+        selectedBox.firstChild.setAttribute("readonly", true);
+    }
+    
+    selectedBox = box;
+    console.log("double clicked", box.firstChild.className);
+    box.style.border = "2px solid yellow";
+
+    if (box.firstChild.className == "textBox") {
+        box.firstChild.removeAttribute("readonly");
     }
 }
 
@@ -216,7 +236,7 @@ function addArrow(finalBox) {
 
 // Add text box
 function addTextBox(finalBox) {
-    finalBox.innerHTML = `<textarea class="textBox" rows="1"></textarea>`;
+    finalBox.innerHTML = `<textarea class="textBox" rows="1" readonly></textarea>`;
 }
 
 
