@@ -2,11 +2,48 @@
 textarea {
     resize: none;
 }
+body {
+    background-color: lightgray;
+}
 
 /* Entry Screen */
 #entryScreen {
     display: block;
+    width: 30%;
+    margin: 0 auto;
+    outline: 3px solid black; 
+    padding: 1rem 10rem 5rem 10rem;
+    text-align: center;
+    background-color: white;
 }
+
+#entryScreen h1 { 
+    margin: 0;
+    font-size: 4em;
+}
+
+#entryScreenButton {
+    display: flex;
+    justify-content: center;
+    gap: 2em;
+    margin-top: 1rem;
+}
+
+#entryScreenButton button {
+    font-size: 1em;
+    border: none;
+    color: white;
+    padding: 1rem 2rem;
+    opacity: 0.6;
+    cursor: pointer;
+    background-color: blue;
+    border-radius: 0.5em;
+}
+
+#entryScreenButton button:hover {
+    opacity: 1;
+}
+
 
 /* Specify Size Screen */
 #specifySizeScreen {
@@ -16,7 +53,51 @@ textarea {
 /* Existing Save Screen */
 #existingSaveScreen {
     display: none;
+    width: 50%;
+    margin: 0 auto;
+    outline: 3px solid black; 
+    background-color: white;
+    padding: 2rem 2rem;
 }
+
+#listSaves {
+    /* outline: red 2px solid; */
+    width: 90%;
+    outline: 2px solid black;
+    margin: 0 auto;
+}
+
+#listSaves thead {
+    text-align: left;
+    font-size: 2.5rem;
+    text-align: center;
+}
+
+#listSaves tbody {
+    /* outline: 2px solid green; */
+    font-size: 2em;
+    text-align: center;
+}
+
+#listSaves th {
+    padding-top: 1rem;
+    padding-bottom: 1rem;
+    background-color: blue;
+    opacity: 0.6;
+    color: white;
+  }
+
+#listSaves tr:nth-child(even){background-color: #f2f2f2;}
+
+.playButton button, .deleteButton button {
+    border-radius: 0.6em;
+    font-size: 0.7em;
+}
+
+
+
+
+
 
 /* Picture Screen */
 #pictureScreen {

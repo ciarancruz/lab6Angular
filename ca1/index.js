@@ -1,7 +1,7 @@
 // Import the functions you need from the SDKs you need
 import { initializeApp } from "firebase/app";
 import { getAnalytics } from "firebase/analytics";
-import { doc, collection, getDocs, addDoc, setDoc, getDoc, getFirestore } from "firebase/firestore";
+import { doc, collection, getDocs, addDoc, setDoc, getDoc, getFirestore, deleteDoc } from "firebase/firestore";
 
 // Your web app's Firebase configuration
 const firebaseConfig = {
@@ -18,6 +18,8 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const analytics = getAnalytics(app);
 const db = getFirestore(app);
+
+loadExistingPicture();
 
 
 ///// Initialize buttons /////
@@ -72,7 +74,6 @@ function startNewPicture() {
 }
 
 function startExistingPicture(doc) {
-    console.log(doc.id);
     showPictureScreen();
     let sizeGrid = doc.data().gridSize;
     let gridData = doc.data().grid;
@@ -196,16 +197,28 @@ function edit(box) {
 
     if (selectedBox != null) {
         selectedBox.style.border = "1px dotted black";
-        selectedBox.firstChild.setAttribute("readonly", true);
+        
+        // Reset textbox to readonly
+        if(selectedBox.firstChild != null) {
+            selectedBox.firstChild.setAttribute("readonly", true);
+        }
     }
-    
-    selectedBox = box;
-    console.log("double clicked", box.firstChild.className);
-    box.style.border = "2px solid yellow";
 
-    if (box.firstChild.className == "textBox") {
-        box.firstChild.removeAttribute("readonly");
+    if (box.firstChild != null) {
+        selectedBox = box;
+
+        selectedBox.style.border = "2px solid yellow";
+
+        if (selectedBox.firstChild.className == "textBox") {
+            selectedBox.firstChild.removeAttribute("readonly");
+        }
+        else {
+            console.log("Box ready for rotate");
+        }
     }
+    console.log("Selected box:", selectedBox);
+
+    
 }
 
 // Delete Element
@@ -253,8 +266,11 @@ async function loadExistingPicture() {
         const row = document.createElement("tr");
         const id = document.createElement("td");
         const button = document.createElement("td");
+        const deleteButton = document.createElement("td");
 
         id.innerHTML = doc.id;
+        button.className = "playButton";
+        deleteButton.className = "deleteButton";
 
         // Button listeners
         const playButton = document.createElement("button");
@@ -262,12 +278,17 @@ async function loadExistingPicture() {
         playButton.innerHTML = "Play";
         playButton.addEventListener("click", () => startExistingPicture(doc));
 
+        const deleteButtonListener = document.createElement("button");
+        deleteButtonListener.innerHTML ="Delete";
+        deleteButtonListener.addEventListener("click", () => deletePictureGrid(doc));
+
         button.appendChild(playButton);
+        deleteButton.appendChild(deleteButtonListener);
         row.appendChild(id);
         row.appendChild(button);
+        row.appendChild(deleteButton);
 
         tableBody.appendChild(row);
-        console.log(doc);
     });
 
     showSaveScreen();
@@ -275,6 +296,12 @@ async function loadExistingPicture() {
 
 // Add a save to firestore db
 function savePictureGrid(sizeGrid) {
+
+    // Revert border from editing
+    selectedBox.style.border = "1px dotted black";
+    if(selectedBox.firstChild != null) {
+        selectedBox.firstChild.setAttribute("readonly", true);
+    }
     
     // Retrieve and save current grid data
     const boxElements = document.querySelectorAll('.col');
@@ -293,7 +320,6 @@ function savePictureGrid(sizeGrid) {
             jsonData.grid.push({type: "arrow"});
         }
         else {
-            console.log(box.firstChild.value);
             jsonData.grid.push({type: "textbox", text: box.firstChild.value});
         }
     })
@@ -311,4 +337,11 @@ function savePictureGrid(sizeGrid) {
     })
 
     showEntryScreen();
+}
+
+// Delete a save from firestore db 
+async function deletePictureGrid(document) {
+    await deleteDoc(doc(db, "drawingSaves", document.id));
+    console.log("Document deleted");
+    location.reload();
 }
