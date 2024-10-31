@@ -87,13 +87,13 @@ function startExistingPicture(doc) {
         for(let j = 0; j < sizeGrid; j++) {
 
             if (gridData[boxCount].type == "arrow") {
-                numBoxesCreated += `<div class="col" draggable="false" id="${"box" + boxCount}"><img src="./src/arrow.jpg" alt="arrowImage" draggable="false" class="arrow"></img></div>`;
+                numBoxesCreated += `<div class="col" draggable="false" id="${"box" + boxCount}" data-rotation="${gridData[boxCount].rotation}"><img src="./src/arrow.jpg" alt="arrowImage" draggable="false" class="arrow"></img></div>`;
             }
             else if (gridData[boxCount].type == "textbox") {
-                numBoxesCreated += `<div class="col" draggable="false" id="${"box" + boxCount}"><textarea class="textBox" rows="1" draggable="false" readonly="true">${gridData[boxCount].text}</textarea></div>`;
+                numBoxesCreated += `<div class="col" draggable="false" id="${"box" + boxCount}" data-rotation="${gridData[boxCount].rotation}"><textarea class="textBox" rows="1" draggable="false" readonly="true">${gridData[boxCount].text}</textarea></div>`;
             }
             else {
-                numBoxesCreated += `<div class="col" draggable="false" id="${"box" + boxCount}"></div>`;
+                numBoxesCreated += `<div class="col" draggable="false" id="${"box" + boxCount}" data-rotation="${gridData[boxCount].rotation}"></div>`;
             }
 
             boxCount++;
@@ -101,15 +101,16 @@ function startExistingPicture(doc) {
     }
 
     document.querySelector(".container").innerHTML = numBoxesCreated;
+    
 
-    // Add event listeners to each box
+    // Add event listeners to each box rotate existing boxes
     const boxElements = document.querySelectorAll('.col');
-    console.log(boxElements);
     boxElements.forEach(box => {
         box.addEventListener("dragstart", drag);
         box.addEventListener("dragover", allowDrop);
         box.addEventListener("drop", drop);
         box.addEventListener("dblclick", () => edit(box));
+        box.style.transform = `rotate(${box.getAttribute("data-rotation")}deg)`;
     })
 
     // Add event listener to drawing elements
@@ -176,6 +177,8 @@ function startPicture(sizeGrid) {
 ///// Drag and Drop Functionality /////
 let startBox = null;
 let selectedBox = null;
+let previousID = null;
+
 
 function drop(ev) {
     ev.preventDefault();
@@ -193,9 +196,12 @@ function drop(ev) {
 // Edit a box when double clicked
 function edit(box) {
 
+    // Makes sure the styling and rules are removed from previously selected box
     if (selectedBox != null) {
         selectedBox.style.border = "1px dotted black";
         selectedBox.setAttribute("draggable", false);
+        selectedBox.id = previousID;
+
         if (selectedBox.firstChild != null) {
             if (selectedBox.firstChild.className == "textBox") {
                 selectedBox.firstChild.setAttribute("readonly", true);
@@ -203,16 +209,24 @@ function edit(box) {
         }
     }
 
+    // Add styling and rules to selected box
     selectedBox = box;
     selectedBox.style.border = "2px solid yellow";
     selectedBox.setAttribute("draggable", true);
+
+    // Set the id of the element to be rotated
+    previousID = selectedBox.id;
+    selectedBox.id = "rotateElement";
+    
+    // Setup element for rotation
+    setupRotation();
+
+    // 
     if (selectedBox.firstChild != null) {
         if (selectedBox.firstChild.className == "arrow") {
-            console.log("EDITING: arrow");
         }
         else {
             // When editing a textbox allow editing text
-            console.log("EDITING: textBox");
             selectedBox.firstChild.removeAttribute("readonly");
         }
     }
@@ -238,7 +252,6 @@ function allowDrop(ev) {
 
 function drag(ev) {
     startBox = ev.target;
-    console.log("DRAG:", ev.target);
 }
 
 // Add Arrow
@@ -252,8 +265,70 @@ function addTextBox(finalBox) {
 }
 
 ///// Rotate Functionality /////
+let rotateElement = null;
+let startX, startY, directionX, directionY, lastMove, pos = null;
+let boxHeight, boxWidth = null;
 
+function setupRotation() {
+    rotateElement = document.getElementById("rotateElement");
 
+    rotateElement.addEventListener("dragstart", rotateDrag);
+    rotateElement.addEventListener("drop", rotateDrop);
+    rotateElement.addEventListener("dragover", rotateDragover);
+
+    // pos gives the position of the mouse relative to the div selected
+    pos = rotateElement.getBoundingClientRect();
+    boxHeight = pos.width;
+    boxWidth = pos.height;
+}
+
+function rotateDrag(ev) {
+    startX = ev.clientX - pos.x;
+    startY = ev.clientY - pos.y;
+}
+
+function rotateDrop(ev) {
+    if (directionX != null & directionY != null & lastMove == "directionX") {
+        rotate(rotateElement, "clockwise");
+    }
+    
+    if (directionX != null & directionY != null & lastMove == "directionY") {
+        rotate(rotateElement, "anticlockwise");
+    }
+
+    directionX = null;
+    directionY = null;
+    lastMove = null;
+}
+
+function rotateDragover(ev) {
+    // Finds whether the element is dragged up or right last
+    if ((ev.clientY - pos.y) <= 10 & !directionY) { // 10px to give some room to register
+        directionY = "up";
+        lastMove = "directionY";
+    }
+    if ((ev.clientX - pos.x) >= boxWidth - 10 & !directionX) {
+        directionX = "right";
+        lastMove = "directionX";
+    }
+}
+
+// Rotate element
+function rotate(rotatedElement, direction) {
+    let newRotation = null;
+    if(rotatedElement.getAttribute("data-rotation") == null || rotatedElement.getAttribute("data-rotation") == "undefined") {
+        rotatedElement.setAttribute("data-rotation", 0);
+    }
+    let currentRotation = parseInt(rotatedElement.getAttribute("data-rotation"));
+    if (direction == "clockwise") {
+        newRotation = currentRotation + 90;
+    }
+    else if (direction == "anticlockwise") {
+        newRotation = currentRotation - 90;
+    } 
+    rotatedElement.style.transform = `rotate(${newRotation}deg)`;
+    rotatedElement.setAttribute("data-rotation", newRotation);
+}
 
 ///// Save and Retrieve Functionality ///// 
 
@@ -313,10 +388,10 @@ function savePictureGrid(sizeGrid) {
             jsonData.grid.push({type: null});
         }
         else if (box.firstChild.className == "arrow") {
-            jsonData.grid.push({type: "arrow"});
+            jsonData.grid.push({type: "arrow", rotation: box.getAttribute("data-rotation")});
         }
         else {
-            jsonData.grid.push({type: "textbox", text: box.firstChild.value});
+            jsonData.grid.push({type: "textbox", text: box.firstChild.value, rotation: box.getAttribute("data-rotation")});
         }
     })
 
