@@ -19,9 +19,6 @@ const app = initializeApp(firebaseConfig);
 const analytics = getAnalytics(app);
 const db = getFirestore(app);
 
-loadExistingPicture();
-
-
 ///// Initialize buttons /////
 const startNewButton = document.getElementById("startNewButton");
 startNewButton.addEventListener("click", startNewPicture);
@@ -93,7 +90,7 @@ function startExistingPicture(doc) {
                 numBoxesCreated += `<div class="col" draggable="true" id="${"box" + boxCount}"><img src="./src/arrow.jpg" alt="arrowImage" draggable="false" class="arrow"></img></div>`;
             }
             else if (gridData[boxCount].type == "textbox") {
-                numBoxesCreated += `<div class="col" draggable="true" id="${"box" + boxCount}"><textarea class="textBox" rows="1" draggable="false">${gridData[boxCount].text}</textarea></div>`;
+                numBoxesCreated += `<div class="col" draggable="true" id="${"box" + boxCount}"><textarea class="textBox" rows="1" draggable="false" readonly="true">${gridData[boxCount].text}</textarea></div>`;
             }
             else {
                 numBoxesCreated += `<div class="col" draggable="true" id="${"box" + boxCount}"></div>`;
@@ -169,6 +166,7 @@ function startPicture(sizeGrid) {
 
     // Clear save name text
     document.getElementById("saveName").value = "";
+    document.getElementById("saveName").style.display = "block";
 
     // Save button event listener
     const savePictureButton = document.getElementById("savePicture");
@@ -197,26 +195,42 @@ function edit(box) {
 
     if (selectedBox != null) {
         selectedBox.style.border = "1px dotted black";
-        
-        // Reset textbox to readonly
-        if(selectedBox.firstChild != null) {
-            selectedBox.firstChild.setAttribute("readonly", true);
+        if (selectedBox.firstChild != null) {
+            if (selectedBox.firstChild.className == "textBox") {
+                selectedBox.firstChild.setAttribute("readonly", true);
+            }
         }
     }
 
-    if (box.firstChild != null) {
-        selectedBox = box;
-
-        selectedBox.style.border = "2px solid yellow";
-
-        if (selectedBox.firstChild.className == "textBox") {
-            selectedBox.firstChild.removeAttribute("readonly");
+    selectedBox = box;
+    selectedBox.style.border = "2px solid yellow";
+    if (selectedBox.firstChild != null) {
+        if (selectedBox.firstChild.className == "arrow") {
+            console.log("EDITING: arrow");
         }
         else {
-            console.log("Box ready for rotate");
+            // When editing a textbox allow editing text
+            console.log("EDITING: textBox");
+            selectedBox.firstChild.removeAttribute("readonly");
         }
     }
-    console.log("Selected box:", selectedBox);
+    else {
+        console.log("EDITING: empty box");
+    }
+
+
+    // if (box.firstChild != null) {
+    //     selectedBox = box;
+
+
+    //     if (selectedBox.firstChild.className == "textBox") {
+    //         selectedBox.firstChild.removeAttribute("readonly");
+    //     }
+    //     else {
+    //         console.log("Box ready for rotate");
+    //     }
+    // }
+    // console.log("Selected box:", selectedBox);
 
     
 }
@@ -297,12 +311,6 @@ async function loadExistingPicture() {
 // Add a save to firestore db
 function savePictureGrid(sizeGrid) {
 
-    // Revert border from editing
-    selectedBox.style.border = "1px dotted black";
-    if(selectedBox.firstChild != null) {
-        selectedBox.firstChild.setAttribute("readonly", true);
-    }
-    
     // Retrieve and save current grid data
     const boxElements = document.querySelectorAll('.col');
     let jsonData = {
