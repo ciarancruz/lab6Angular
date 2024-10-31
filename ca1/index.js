@@ -87,13 +87,13 @@ function startExistingPicture(doc) {
         for(let j = 0; j < sizeGrid; j++) {
 
             if (gridData[boxCount].type == "arrow") {
-                numBoxesCreated += `<div class="col" draggable="true" id="${"box" + boxCount}"><img src="./src/arrow.jpg" alt="arrowImage" draggable="false" class="arrow"></img></div>`;
+                numBoxesCreated += `<div class="col" draggable="false" id="${"box" + boxCount}"><img src="./src/arrow.jpg" alt="arrowImage" draggable="false" class="arrow"></img></div>`;
             }
             else if (gridData[boxCount].type == "textbox") {
-                numBoxesCreated += `<div class="col" draggable="true" id="${"box" + boxCount}"><textarea class="textBox" rows="1" draggable="false" readonly="true">${gridData[boxCount].text}</textarea></div>`;
+                numBoxesCreated += `<div class="col" draggable="false" id="${"box" + boxCount}"><textarea class="textBox" rows="1" draggable="false" readonly="true">${gridData[boxCount].text}</textarea></div>`;
             }
             else {
-                numBoxesCreated += `<div class="col" draggable="true" id="${"box" + boxCount}"></div>`;
+                numBoxesCreated += `<div class="col" draggable="false" id="${"box" + boxCount}"></div>`;
             }
 
             boxCount++;
@@ -141,7 +141,7 @@ function startPicture(sizeGrid) {
     let boxCount = 0;
     for(let i = 0; i < sizeGrid; i++) {
         for(let j = 0; j < sizeGrid; j++) {
-            numBoxesCreated += `<div class="col" draggable="true" id="${"box" + boxCount}"></div>`;
+            numBoxesCreated += `<div class="col" draggable="false" id="${"box" + boxCount}"></div>`;
             boxCount++;
         }
     }
@@ -195,6 +195,7 @@ function edit(box) {
 
     if (selectedBox != null) {
         selectedBox.style.border = "1px dotted black";
+        selectedBox.setAttribute("draggable", false);
         if (selectedBox.firstChild != null) {
             if (selectedBox.firstChild.className == "textBox") {
                 selectedBox.firstChild.setAttribute("readonly", true);
@@ -204,6 +205,7 @@ function edit(box) {
 
     selectedBox = box;
     selectedBox.style.border = "2px solid yellow";
+    selectedBox.setAttribute("draggable", true);
     if (selectedBox.firstChild != null) {
         if (selectedBox.firstChild.className == "arrow") {
             console.log("EDITING: arrow");
@@ -217,28 +219,11 @@ function edit(box) {
     else {
         console.log("EDITING: empty box");
     }
-
-
-    // if (box.firstChild != null) {
-    //     selectedBox = box;
-
-
-    //     if (selectedBox.firstChild.className == "textBox") {
-    //         selectedBox.firstChild.removeAttribute("readonly");
-    //     }
-    //     else {
-    //         console.log("Box ready for rotate");
-    //     }
-    // }
-    // console.log("Selected box:", selectedBox);
-
-    
 }
 
 // Delete Element
 function deleteDrop(ev) {
     ev.preventDefault();
-    const finalBox = ev.target;
 
     // Makes sure drawing elements cannot be deleted
     if (startBox.innerHTML !== "" & startBox.id != "arrow" & startBox.id != "textBox") {
@@ -265,6 +250,9 @@ function addArrow(finalBox) {
 function addTextBox(finalBox) {
     finalBox.innerHTML = `<textarea class="textBox" rows="1" readonly></textarea>`;
 }
+
+///// Rotate Functionality /////
+
 
 
 ///// Save and Retrieve Functionality ///// 
@@ -350,6 +338,6 @@ function savePictureGrid(sizeGrid) {
 // Delete a save from firestore db 
 async function deletePictureGrid(document) {
     await deleteDoc(doc(db, "drawingSaves", document.id));
-    console.log("Document deleted");
     location.reload();
+    console.log("Document deleted");
 }
