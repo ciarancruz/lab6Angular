@@ -196,6 +196,8 @@ function drop(ev) {
 // Edit a box when double clicked
 function edit(box) {
 
+    console.log("BOX BEFORE EDIT:", box);
+
     // Makes sure the styling and rules are removed from previously selected box
     if (selectedBox != null) {
         selectedBox.style.border = "1px dotted black";
@@ -218,6 +220,8 @@ function edit(box) {
     previousID = selectedBox.id;
     selectedBox.id = "rotateElement";
     
+    console.log("BEFORE ROTATION:", box);
+
     // Setup element for rotation
     setupRotation();
 
@@ -233,6 +237,8 @@ function edit(box) {
     else {
         console.log("EDITING: empty box");
     }
+
+    console.log("BOX AFTER EDIT:", box);
 }
 
 // Delete Element
@@ -288,6 +294,7 @@ function rotateDrag(ev) {
 }
 
 function rotateDrop(ev) {
+    console.log(directionX, directionY, lastMove);
     if (directionX != null & directionY != null & lastMove == "directionX") {
         rotate(rotateElement, "clockwise");
     }
@@ -303,11 +310,11 @@ function rotateDrop(ev) {
 
 function rotateDragover(ev) {
     // Finds whether the element is dragged up or right last
-    if ((ev.clientY - pos.y) <= 10 & !directionY) { // 10px to give some room to register
+    if ((ev.clientY - pos.y) <= 15 & !directionY) { // 10px to give some room to register
         directionY = "up";
         lastMove = "directionY";
     }
-    if ((ev.clientX - pos.x) >= boxWidth - 10 & !directionX) {
+    if ((ev.clientX - pos.x) >= boxWidth - 15 & !directionX) {
         directionX = "right";
         lastMove = "directionX";
     }
@@ -316,7 +323,7 @@ function rotateDragover(ev) {
 // Rotate element
 function rotate(rotatedElement, direction) {
     let newRotation = null;
-    if(rotatedElement.getAttribute("data-rotation") == null || rotatedElement.getAttribute("data-rotation") == "undefined") {
+    if(rotatedElement.getAttribute("data-rotation") == null || rotatedElement.getAttribute("data-rotation") == "undefined" || rotatedElement.getAttribute("data-rotation") == "NaN") {
         rotatedElement.setAttribute("data-rotation", 0);
     }
     let currentRotation = parseInt(rotatedElement.getAttribute("data-rotation"));
