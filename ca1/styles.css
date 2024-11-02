@@ -247,3 +247,7 @@ body {
     height: 2em;
     font-size: 0.9em;
 }
+
+#pictureScreen > button {
+    margin-bottom: 2em;
+}
