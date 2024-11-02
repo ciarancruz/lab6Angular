@@ -24,7 +24,12 @@ const startNewButton = document.getElementById("startNewButton");
 startNewButton.addEventListener("click", startNewPicture);
 const retrieveExistingButton = document.getElementById("retrieveExistingButton");
 retrieveExistingButton.addEventListener("click", loadExistingPicture);
+const backButton = document.querySelectorAll(".backNav");
+backButton.forEach(button => {
+    button.addEventListener("click", showEntryScreen);
+})
 
+startPicture(3);
 
 ///// Show or hide screens /////
 function showEntryScreen() {
@@ -200,7 +205,7 @@ function edit(box) {
 
     // Makes sure the styling and rules are removed from previously selected box
     if (selectedBox != null) {
-        selectedBox.style.border = "1px dotted black";
+        selectedBox.style.outline = "1px dashed black";
         selectedBox.setAttribute("draggable", false);
         selectedBox.id = previousID;
 
@@ -213,7 +218,7 @@ function edit(box) {
 
     // Add styling and rules to selected box
     selectedBox = box;
-    selectedBox.style.border = "2px solid yellow";
+    selectedBox.style.outline = "2px solid yellow";
     selectedBox.setAttribute("draggable", true);
 
     // Set the id of the element to be rotated
@@ -227,10 +232,7 @@ function edit(box) {
 
     // 
     if (selectedBox.firstChild != null) {
-        if (selectedBox.firstChild.className == "arrow") {
-        }
-        else {
-            // When editing a textbox allow editing text
+        if (selectedBox.firstChild.className == "textBox") {
             selectedBox.firstChild.removeAttribute("readonly");
         }
     }
