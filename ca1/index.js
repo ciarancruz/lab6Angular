@@ -29,7 +29,7 @@ backButton.forEach(button => {
     button.addEventListener("click", showEntryScreen);
 })
 
-startPicture(3);
+startPicture(10);
 
 ///// Show or hide screens /////
 function showEntryScreen() {
@@ -141,7 +141,6 @@ function startPicture(sizeGrid) {
 
     // Change grid size
     document.querySelector(".container").style.gridTemplateColumns = `repeat(${sizeGrid}, 1fr)`;
-    document.querySelector(".drawingElements").style.gridTemplateColumns = `repeat(${sizeGrid}, 1fr)`;
 
     // Create grid
     let boxCount = 0;
@@ -177,6 +176,16 @@ function startPicture(sizeGrid) {
     // Save button event listener
     const savePictureButton = document.getElementById("savePicture");
     savePictureButton.addEventListener("click", () => savePictureGrid(sizeGrid));
+
+    // // For styling 
+    if (sizeGrid >= 6) {
+        const drawingElements = document.querySelectorAll(".container");
+        drawingElements[0].style.fontSize = "0.5rem";
+    }
+    else {
+        const drawingElements = document.querySelectorAll(".container");
+        drawingElements[0].style.fontSize = "1rem";
+    }
 }
 
 ///// Drag and Drop Functionality /////
