@@ -19,6 +19,9 @@ const app = initializeApp(firebaseConfig);
 const analytics = getAnalytics(app);
 const db = getFirestore(app);
 
+// Define size grid variable
+let sizeGrid = null;
+
 ///// Initialize buttons /////
 const startNewButton = document.getElementById("startNewButton");
 startNewButton.addEventListener("click", startNewPicture);
@@ -68,14 +71,14 @@ function startNewPicture() {
     // Pick grid size
     const specifySizeSubmit = document.getElementById("specifySizeSubmit");
     specifySizeSubmit.addEventListener("click", function(e) {
-        var gridSize = document.getElementById('gridSize').value;
-        startPicture(gridSize);
+        sizeGrid = document.getElementById('gridSize').value;
+        startPicture(sizeGrid);
     });
 }
 
 function startExistingPicture(doc) {
     showPictureScreen();
-    let sizeGrid = doc.data().gridSize;
+    sizeGrid = doc.data().gridSize;
     let gridData = doc.data().grid;
 
     // Set grid size
@@ -153,7 +156,7 @@ function startPicture(sizeGrid) {
     let boxCount = 0;
     for(let i = 0; i < sizeGrid; i++) {
         for(let j = 0; j < sizeGrid; j++) {
-            numBoxesCreated += `<div class="col" draggable="false" id="${"box" + boxCount}"></div>`;
+            numBoxesCreated += `<div class="col" draggable="false" id="${"box" + boxCount}" data-rotation="0"></div>`;
             boxCount++;
         }
     }
@@ -162,7 +165,6 @@ function startPicture(sizeGrid) {
 
     // Add event listeners to each box
     const boxElements = document.querySelectorAll('.col');
-    console.log(boxElements);
     boxElements.forEach(box => {
         box.addEventListener("dragstart", drag);
         box.addEventListener("dragover", allowDrop);
@@ -200,11 +202,154 @@ let startBox = null;
 let selectedBox = null;
 let previousID = null;
 
+function checkAdjacent(start, final, sizeGrid) {
+    
+    const startIndex = getIndex(start);
+    const finalIndex = getIndex(final);
+
+    if (startIndex === -1 || finalIndex === -1) {
+        return false;
+    }
+
+    const startRow = Math.floor(startIndex / sizeGrid);
+    const startCol = startIndex % sizeGrid;
+    const finalRow = Math.floor(finalIndex / sizeGrid);
+    const finalCol = finalIndex % sizeGrid;
+
+    // Check if the tiles are adjacent 
+    const isAdjacent = (startRow === finalRow && Math.abs(startCol - finalCol) === 1) || (startCol === finalCol && Math.abs(startRow - finalRow) === 1);    
+
+    return isAdjacent;
+}
+
+// Returns the index of the div in the table
+function getIndex(box) {
+    var boxElements = document.querySelectorAll('.container .col');
+    for(let i = 0; i < boxElements.length; i++) {
+        if (boxElements[i].firstChild === box || boxElements[i] === box) {
+            return i; // Gets index of image in table
+        }
+    }
+
+    return -1; // Not found
+}
+
+function swapBoxes(startBox, finalBox) {
+    console.log("Before swap", startBox, finalBox)
+    if (startBox != finalBox) {
+
+        // Rules for dropping on textarea
+        if (finalBox.tagName == "TEXTAREA") {
+
+            finalBox = finalBox.parentElement;
+
+            // Arrow on text
+            if (startBox.firstChild.tagName == "IMG") {
+                let temp = startBox.firstChild.outerHTML;
+                let tempData = finalBox.firstChild.value;
+
+                startBox.innerHTML = finalBox.firstChild.outerHTML;
+                finalBox.innerHTML = temp;
+
+                startBox.firstChild.value = tempData;
+
+                swapRotationData(startBox, finalBox);
+            }
+
+            // Text on text
+            else {
+                let startTempData = startBox.firstChild.value;
+                let finalTempData = finalBox.firstChild.value;
+                let temp = startBox.firstChild.outerHTML;
+
+                startBox.innerHTML = finalBox.firstChild.outerHTML;
+                finalBox.innerHTML = temp;
+                
+                startBox.firstChild.value = finalTempData;
+                finalBox.firstChild.value = startTempData;
+
+                swapRotationData(startBox, finalBox);
+            }
+
+            
+        }
+
+        // Rules for dropping on img 
+        else if(finalBox.tagName == "IMG") {
+
+            // Text on arrow
+            if (startBox.firstChild.tagName == "TEXTAREA") {
+                finalBox = finalBox.parentElement;
+
+                let temp = startBox.firstChild.outerHTML;
+                let tempData = startBox.firstChild.value;
+                console.log(tempData);
+
+                // Swap the innerHTML
+                startBox.innerHTML = finalBox.firstChild.outerHTML;
+                finalBox.innerHTML = temp;
+                finalBox.firstChild.value = tempData;
+
+                // Swap rotation data
+                swapRotationData(startBox, finalBox);
+
+            }
+            else { // arrow on arrow
+                // Swap rotate data
+                let tempRotate = startBox.getAttribute("data-rotation");
+                startBox.setAttribute("data-rotation", finalBox.parentElement.getAttribute("data-rotation"));
+                finalBox.parentElement.setAttribute("data-rotation", tempRotate);
+
+                startBox.style.transform = `rotate(${startBox.getAttribute("data-rotation")}deg)`;
+                finalBox.parentElement.style.transform = `rotate(${finalBox.parentElement.getAttribute("data-rotation")}deg)`;
+            }   
+        }
+
+        //  Dropping on empty box
+        else {
+
+            // Arrow on empty
+            if (startBox.firstChild.tagName == "IMG") {
+                finalBox.innerHTML = startBox.innerHTML;
+                startBox.innerHTML = null;
+            }
+
+            // Text on empty
+            else if (startBox.firstChild.tagName == "TEXTAREA") {
+                let textData = startBox.firstChild.value;
+                finalBox.innerHTML = startBox.innerHTML;
+                finalBox.firstChild.value = textData;
+                startBox.innerHTML = null;
+            }  
+
+            // Swap rotation data
+            let tempRotate = startBox.getAttribute("data-rotation");
+            startBox.setAttribute("data-rotation", finalBox.getAttribute("data-rotation"));
+            finalBox.setAttribute("data-rotation", tempRotate);
+
+            finalBox.style.transform = `rotate(${finalBox.getAttribute("data-rotation")}deg)`;
+            startBox.style.transform = `rotate(0deg)`;
+            
+        }
+
+    }
+}
+
+// Swaps the data-rotation attribute between two boxes
+function swapRotationData(startBox, finalBox) {
+
+    let tempRotate = startBox.getAttribute("data-rotation");
+    startBox.setAttribute("data-rotation", finalBox.getAttribute("data-rotation"));
+    finalBox.setAttribute("data-rotation", tempRotate);
+    
+    startBox.style.transform = `rotate(${startBox.getAttribute("data-rotation")}deg)`;
+    finalBox.style.transform = `rotate(${finalBox.getAttribute("data-rotation")}deg)`;
+}
 
 function drop(ev) {
     ev.preventDefault();
     const finalBox = ev.target;
-    console.log("Final:", ev.target);
+    console.log("Final:", finalBox);
 
     if(startBox.id === "arrow") {
         addArrow(finalBox);
@@ -212,12 +357,17 @@ function drop(ev) {
     else if (startBox.id === "textBox") {
         addTextBox(finalBox);
     }
+
+    // Check if a boxes are beside each other before swapping
+    if (checkAdjacent(startBox, finalBox, sizeGrid)) {
+        swapBoxes(startBox, finalBox);
+    }
 }
 
 // Edit a box when double clicked
 function edit(box) {
 
-    console.log("BOX BEFORE EDIT:", box);
+    console.log("Start Box:", box);
 
     // Makes sure the styling and rules are removed from previously selected box
     if (selectedBox != null) {
@@ -240,23 +390,16 @@ function edit(box) {
     // Set the id of the element to be rotated
     previousID = selectedBox.id;
     selectedBox.id = "rotateElement";
-    
-    console.log("BEFORE ROTATION:", box);
 
     // Setup element for rotation
     setupRotation();
 
-    // 
+    // Only selected element can be edited
     if (selectedBox.firstChild != null) {
         if (selectedBox.firstChild.className == "textBox") {
             selectedBox.firstChild.removeAttribute("readonly");
         }
     }
-    else {
-        console.log("EDITING: empty box");
-    }
-
-    console.log("BOX AFTER EDIT:", box);
 }
 
 // Delete Element
@@ -266,6 +409,8 @@ function deleteDrop(ev) {
     // Makes sure drawing elements cannot be deleted
     if (startBox.innerHTML !== "" & startBox.id != "arrow" & startBox.id != "textBox") {
         startBox.innerHTML = "";
+        startBox.setAttribute("data-rotation", "0");
+        startBox.style.transform = `rotate(${startBox.getAttribute("data-rotation")})`;
     }
     
 }
@@ -285,7 +430,7 @@ function addArrow(finalBox) {
 
 // Add text box
 function addTextBox(finalBox) {
-    finalBox.innerHTML = `<textarea class="textBox" rows="1" readonly></textarea>`;
+    finalBox.innerHTML = `<textarea class="textBox" rows="1"readonly></textarea>`;
 }
 
 ///// Rotate Functionality /////
@@ -307,12 +452,13 @@ function setupRotation() {
 }
 
 function rotateDrag(ev) {
+    // Give coordinates relative to div selected
     startX = ev.clientX - pos.x;
     startY = ev.clientY - pos.y;
 }
 
+// Drop function for rotating element
 function rotateDrop(ev) {
-    console.log(directionX, directionY, lastMove);
     if (directionX != null & directionY != null & lastMove == "directionX") {
         rotate(rotateElement, "clockwise");
     }
