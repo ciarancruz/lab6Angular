@@ -3,10 +3,70 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CA1</title>
-  <script type="module" crossorigin src="/assets/index-B5Qt9EMX.js"></script>
+    <title>CA1</title>
+  <script type="module" crossorigin src="./assets/index-DyMo0gQV.js"></script>
+  <link rel="stylesheet" crossorigin href="./assets/index-BTfoWRi2.css">
 </head>
 <body>
-    
+    
+    <div id="entryScreen">
+        <h1>Drawing Diagrams</h1>
+        <div id="entryScreenButton">
+            <button id="startNewButton">Start New</button>
+            <button id="retrieveExistingButton">Retrieve Existing</button>
+        </div>
+    </div>
+    
+
+    <div id="specifySizeScreen">
+        <h1>Choose a grid size</h1>
+        <form>
+            <label for="gridSize">Grid Size (3-10)</label>
+            <input type="number" min="3" max="10" id="gridSize">
+        </form>
+        <button class="backNav">Back</button>
+        <button id="specifySizeSubmit">Submit</button>
+    </div>
+
+    <div id="existingSaveScreen">
+        <table id="listSaves">
+            <thead>
+                <tr>
+                    <th>Save Name</th>
+                    <th>Play</th>
+                    <th>Delete</th>
+                </tr>
+            </thead>
+            <tbody>
+            </tbody>
+        </table>
+        <button class="backNav">Back</button>
+    </div>
+
+    <div id="pictureScreen">
+        <h1 id="pictureTitle">Picture Screen</h1>
+        <div class="container">
+        </div>
+        <h1 id="drawingTitle">Drawing Elements</h1>
+        <h3>Drag to add to grid</h3>
+        <div class="drawingElements">
+            <div id="textBox" draggable="true">TextBox</div>
+            <div id="arrow" draggable="true"><img src="./assets/arrow-zy6DZDx3.jpg" alt="arrowImage" draggable="false"></div>
+            <div id="deleteElement">Drag here to delete</div>
+        </div>
+
+        <input id="saveName" type="text" placeholder="Save Name..">
+        <button class="backNav">Back</button>
+        <button id="savePicture">Save Picture</button>
+    </div>
+
+
+    
+
+
+    
+
+
+
 </body>
 </html>
