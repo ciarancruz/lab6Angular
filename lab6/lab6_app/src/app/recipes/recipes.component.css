@@ -1,0 +1,9 @@
+.recipes {
+    outline: 4px solid darkcyan;
+    background: lightblue;
+    border-radius: 30px;
+    width: 20%;
+    margin: 0 auto;
+    margin-top: 20px;
+    
+}

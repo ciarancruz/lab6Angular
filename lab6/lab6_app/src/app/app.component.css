@@ -1,0 +1,8 @@
+main {
+    outline: 1px solid black;
+    text-align: center;
+}
+
+.nav {
+    outline: 1px solid blue;
+}

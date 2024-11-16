@@ -1,0 +1,7 @@
+<section>
+    <button>Show all recipes</button>
+    <button>Show favourites</button>
+    <app-recipes 
+        *ngFor="let recipe of recipeList"
+        [recipe]="recipe"></app-recipes>
+</section>
