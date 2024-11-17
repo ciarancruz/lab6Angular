@@ -1,8 +1,14 @@
 main {
     outline: 1px solid black;
     text-align: center;
+    background-color: lightgrey;
 }
 
 .nav {
-    outline: 1px solid blue;
+    outline: 1px solid ;
+    background-color: rgba(173, 166, 166, 0.911);
+}
+
+h1 {
+    font-size: 3rem;
 }
