@@ -16,7 +16,20 @@ export class HomeComponent {
   foodRecipeService: FoodRecipesService = inject(FoodRecipesService);
 
   recipeList: Recipe[] = [];
+  filteredRecipeList: Recipe[] = [];
+
   constructor() {
     this.recipeList = this.foodRecipeService.getAllRecipes();
+    this.filteredRecipeList = this.recipeList;
+  }
+
+  filterResults(isFavourite: string) {
+    if (isFavourite === "False") {
+      this.filteredRecipeList = this.recipeList
+      return
+    }
+
+    this.filteredRecipeList = this.foodRecipeService.getFavouriteRecipes();
+
   }
 }

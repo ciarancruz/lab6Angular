@@ -79,7 +79,7 @@ export class FoodRecipesService {
     return this.recipeList
   }
 
-  getRecipeByID(id: number): Recipe | undefined {
-    return this.recipeList.find((recipe) => recipe.id === id);
+  getFavouriteRecipes(): Recipe[] {
+    return this.recipeList.filter((recipe) => recipe.favourite === true);
   }
 }
